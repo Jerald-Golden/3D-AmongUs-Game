@@ -1,8 +1,12 @@
 import Game from "./game/game";
+import UI from "./ui/ui";
 
 function App() {
   return (
-    <Game />
+    <>
+      <UI />
+      <Game />
+    </>
   );
 }
 

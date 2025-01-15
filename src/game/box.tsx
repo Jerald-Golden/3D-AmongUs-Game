@@ -9,7 +9,7 @@ interface BaseBoxProps {
 const BaseBox: React.FC<BaseBoxProps> = ({ position, args, color }) => {
   return (
     <RigidBody position={position}>
-      <mesh>
+      <mesh castShadow >
         <boxGeometry args={args} />
         <meshStandardMaterial color={color} />
       </mesh>

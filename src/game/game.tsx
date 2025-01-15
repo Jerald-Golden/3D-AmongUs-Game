@@ -1,15 +1,18 @@
 import { Canvas } from '@react-three/fiber';
-import { Loader, PointerLockControls } from '@react-three/drei';
+import { PointerLockControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 
-import Floor from '../environment/floor';
-import BaseBox from './box';
 import Player from '../player/player';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Environments from '../environment/environment';
+import Map from './map/map';
 
 const Game = () => {
-  const [debug, setDebug] = useState(true);
+  const [debug, setDebug] = useState(false);
+
+  const playerSpawnPoints: [[number, number, number], [number, number, number]][] = [
+    [[93.7, 4, -81], [0, -Math.PI, 0]]
+  ];
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -22,21 +25,18 @@ const Game = () => {
   }, []);
 
   return (
-    <div>
+    <Suspense fallback={null} >
       <Canvas style={{ width: "100vw", height: "100vh" }} shadows camera={{ fov: 50 }}>
         <Environments />
 
         <Physics gravity={[0, -9.8, 0]} debug={debug} >
-          <BaseBox position={[5, 1, 0]} args={[1.5, 2, 1.3]} color="orange" />
-          <Player position={[0, 2, 0]} rotation={[0, -Math.PI / 2, 0]}/>
-
-          <Floor />
+          <Player position={playerSpawnPoints[0][0]} rotation={playerSpawnPoints[0][1]} canJump={false} />
+          <Map />
         </Physics>
 
         <PointerLockControls maxPolarAngle={Math.PI - 1} minPolarAngle={(Math.PI / 2.1)} />
       </Canvas>
-      <Loader />
-    </div>
+    </Suspense>
   );
 };
 

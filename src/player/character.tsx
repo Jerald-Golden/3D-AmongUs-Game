@@ -33,10 +33,10 @@ const CharacterModel: React.FC<{ visibility: boolean }> = (props) => {
         }
 
         return () => clearInterval(staminaInterval);
+        // eslint-disable-next-line
     }, [isSprinting, sprint, stamina]);
 
     useFrame(() => {
-        console.log('stamina: ', stamina);
         const group = groupRef.current;
         if (!group) return;
 
@@ -69,7 +69,7 @@ const CharacterModel: React.FC<{ visibility: boolean }> = (props) => {
     return (
         <>
             {scene && (
-                <group visible={props.visibility} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]} ref={groupRef}>
+                <group position={[0, -1.2, 0]} visible={props.visibility} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]} ref={groupRef}>
                     <primitive object={scene} />
                 </group>
             )}

@@ -7,6 +7,7 @@ const Environments: React.FC = () => {
         <>
             <Lights />
             <Sky />
+            <fog attach="fog" args={['black', 0.005, 40]} />
             <Environment preset='city' />
         </>
     );

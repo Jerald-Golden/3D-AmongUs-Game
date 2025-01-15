@@ -29,7 +29,7 @@ export const usePlayerControls = (): Movement => {
     backward: false,
     left: false,
     right: false,
-    cameraToggle: true,
+    cameraToggle: false,
     jump: false,
     sprint: false,
     debug: false,
@@ -61,6 +61,7 @@ export const usePlayerControls = (): Movement => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
+    // eslint-disable-next-line
   }, []);
 
   return movement;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useRef, useEffect, useState } from 'react';
-import { RigidBody, RapierRigidBody } from '@react-three/rapier';
+import { RigidBody, RapierRigidBody, CapsuleCollider } from '@react-three/rapier';
 import { useFrame, useThree } from '@react-three/fiber';
 import { usePlayerControls } from '../utils/helpers';
 import CharacterModel from './character';
@@ -8,6 +8,7 @@ import CharacterModel from './character';
 interface PlayerProps {
   position: [number, number, number];
   rotation: [number, number, number];
+  canJump: boolean
 }
 
 const Player: React.FC<PlayerProps> = (props) => {
@@ -29,6 +30,16 @@ const Player: React.FC<PlayerProps> = (props) => {
 
   useEffect(() => {
     camera.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
+    if (isThirdPerson) {
+      const offset = new THREE.Vector3(0, 1, 10);
+      const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
+      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+    } else {
+      const offset = new THREE.Vector3(0, 1, 0);
+      const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
+      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+    }
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -42,12 +53,12 @@ const Player: React.FC<PlayerProps> = (props) => {
     const position = rigidBody.translation();
 
     if (isThirdPerson) {
-      const offset = new THREE.Vector3(0, 2, 10);
+      const offset = new THREE.Vector3(0, 1, 10);
       const cameraPosition = new THREE.Vector3();
       cameraPosition.copy(position).add(offset.applyQuaternion(camera.quaternion));
       camera.position.lerp(cameraPosition, 0.1);
     } else {
-      const offset = new THREE.Vector3(0, 2, 0);
+      const offset = new THREE.Vector3(0, 1, 0);
       const cameraPosition = new THREE.Vector3();
       cameraPosition.copy(position).add(offset.applyQuaternion(camera.quaternion));
       camera.position.lerp(cameraPosition, 0.1);
@@ -61,7 +72,7 @@ const Player: React.FC<PlayerProps> = (props) => {
 
     rigidBody.setLinvel({ x: direction.x, y: velocity.y, z: direction.z }, true);
 
-    if (jump && Math.abs(velocity.y) < 0.05) {
+    if (props.canJump && jump && Math.abs(velocity.y) < 0.05) {
       rigidBody.setLinvel({ x: velocity.x, y: 5, z: velocity.z }, true);
     }
 
@@ -74,8 +85,10 @@ const Player: React.FC<PlayerProps> = (props) => {
   });
 
   return (
-    <RigidBody includeInvisible lockRotations ref={rigidBodyRef} colliders="cuboid" position={props.position} mass={1} type="dynamic" rotation={[initialRotation.x, initialRotation.y, initialRotation.z]}>
-      <CharacterModel visibility={cameraToggle} />
+    <RigidBody includeInvisible lockRotations ref={rigidBodyRef} colliders={false} position={props.position} mass={1} type="dynamic" rotation={[initialRotation.x, initialRotation.y, initialRotation.z]}>
+      <CapsuleCollider args={[0.45, 0.75]} >
+        <CharacterModel visibility={cameraToggle} />
+      </CapsuleCollider>
     </RigidBody>
   );
 };

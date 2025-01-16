@@ -4,41 +4,42 @@ import { RigidBody, RapierRigidBody, CapsuleCollider } from '@react-three/rapier
 import { useFrame, useThree } from '@react-three/fiber';
 import { usePlayerControls } from '../utils/helpers';
 import CharacterModel from './character';
+import { useRoom } from '../multiplayer/roomContext';
+import { useStamina } from '../store/store';
 
 interface PlayerProps {
   position: [number, number, number];
   rotation: [number, number, number];
-  canJump: boolean
+  canJump: boolean;
 }
 
 const Player: React.FC<PlayerProps> = (props) => {
   const direction = new THREE.Vector3();
   const frontVector = new THREE.Vector3();
   const sideVector = new THREE.Vector3();
+  const rigidBodyRef = useRef<RapierRigidBody>(null);
   const targetQuaternion = useRef(new THREE.Quaternion());
+  const lastSentTime = useRef<number>(Date.now());
+  const lastSentPosition = useRef<THREE.Vector3>(new THREE.Vector3(...props.position));
+  const lastSentRotation = useRef<THREE.Quaternion>(new THREE.Quaternion());
 
   const WALKSPEED = 5;
-  const SPRINTSPEED = 10;
+  const SPRINTSPEED = 7.5;
 
+  const { room } = useRoom();
   const { camera } = useThree();
-  const rigidBodyRef = useRef<RapierRigidBody>(null);
-
+  const { stamina, setStamina } = useStamina();
   const { forward, backward, left, right, jump, sprint, cameraToggle } = usePlayerControls();
+
   const [isThirdPerson, setIsThirdPerson] = useState(false);
 
   const initialRotation = new THREE.Euler(...props.rotation);
 
   useEffect(() => {
     camera.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
-    if (isThirdPerson) {
-      const offset = new THREE.Vector3(0, 1, 10);
-      const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
-      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-    } else {
-      const offset = new THREE.Vector3(0, 1, 0);
-      const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
-      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-    }
+    const offset = isThirdPerson ? new THREE.Vector3(0, 1, 10) : new THREE.Vector3(0, 1, 0);
+    const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
+    camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
     // eslint-disable-next-line
   }, []);
 
@@ -46,27 +47,38 @@ const Player: React.FC<PlayerProps> = (props) => {
     setIsThirdPerson(cameraToggle);
   }, [cameraToggle]);
 
+  useEffect(() => {
+    let staminaInterval: NodeJS.Timeout;
+
+    if (sprint) {
+      staminaInterval = setInterval(() => {
+        setStamina(Math.max(stamina - 10, 0));
+      }, 1000);
+    } else if ((stamina < 100)) {
+      staminaInterval = setInterval(() => {
+        setStamina(Math.min(stamina + 15, 100));
+      }, 500);
+    }
+
+    return () => clearInterval(staminaInterval);
+    // eslint-disable-next-line
+  }, [sprint, stamina]);
+
   useFrame(() => {
     const rigidBody = rigidBodyRef.current;
     if (!rigidBody) return;
 
     const position = rigidBody.translation();
+    const currentRotation = rigidBody.rotation();
+    const currentQuaternion = new THREE.Quaternion(currentRotation.x, currentRotation.y, currentRotation.z, currentRotation.w);
 
-    if (isThirdPerson) {
-      const offset = new THREE.Vector3(0, 1, 10);
-      const cameraPosition = new THREE.Vector3();
-      cameraPosition.copy(position).add(offset.applyQuaternion(camera.quaternion));
-      camera.position.lerp(cameraPosition, 0.1);
-    } else {
-      const offset = new THREE.Vector3(0, 1, 0);
-      const cameraPosition = new THREE.Vector3();
-      cameraPosition.copy(position).add(offset.applyQuaternion(camera.quaternion));
-      camera.position.lerp(cameraPosition, 0.1);
-    }
+    const offset = isThirdPerson ? new THREE.Vector3(0, 1, 10) : new THREE.Vector3(0, 1, 0);
+    const cameraPosition = new THREE.Vector3().copy(position).add(offset.applyQuaternion(camera.quaternion));
+    camera.position.lerp(cameraPosition, 0.1);
 
     frontVector.set(0, 0, Number(backward) - Number(forward));
     sideVector.set(Number(left) - Number(right), 0, 0);
-    direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(sprint ? SPRINTSPEED : WALKSPEED).applyEuler(camera.rotation);
+    direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(sprint && stamina > 0 ? SPRINTSPEED : WALKSPEED).applyEuler(camera.rotation);
 
     const velocity = rigidBody.linvel();
 
@@ -81,7 +93,19 @@ const Player: React.FC<PlayerProps> = (props) => {
     const cameraEuler = new THREE.Euler().setFromQuaternion(cameraQuaternion, 'YXZ');
     const yawQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, cameraEuler.y, 0));
     targetQuaternion.current.slerp(yawQuaternion, 0.1);
-    rigidBody.setRotation({ x: targetQuaternion.current.x, y: targetQuaternion.current.y, z: targetQuaternion.current.z, w: targetQuaternion.current.w, }, true);
+    rigidBody.setRotation({ x: targetQuaternion.current.x, y: targetQuaternion.current.y, z: targetQuaternion.current.z, w: targetQuaternion.current.w }, true);
+
+    const now = Date.now();
+    const positionDiff = lastSentPosition.current.distanceTo(position);
+    const rotationDiff = lastSentRotation.current.angleTo(currentQuaternion);
+
+    if (room && now - lastSentTime.current > 10 && (positionDiff > 0.01 || rotationDiff > 0.01)) {
+      const euler: any = new THREE.Euler().setFromQuaternion(currentQuaternion, 'YXZ');
+      room.send('move', { position, rotation: { x: euler.x, y: euler.y, z: euler.z } });
+      lastSentPosition.current.copy(position);
+      lastSentRotation.current.copy(currentQuaternion);
+      lastSentTime.current = now;
+    }
   });
 
   return (

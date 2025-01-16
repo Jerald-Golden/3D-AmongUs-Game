@@ -6,6 +6,8 @@ import Player from '../player/player';
 import { Suspense, useEffect, useState } from 'react';
 import Environments from '../environment/environment';
 import Map from './map/map';
+import { RoomProvider } from '../multiplayer/roomContext';
+import MultiPlayers from '../multiplayer/multiplayers';
 
 const Game = () => {
   const [debug, setDebug] = useState(false);
@@ -30,7 +32,10 @@ const Game = () => {
         <Environments />
 
         <Physics gravity={[0, -9.8, 0]} debug={debug} >
-          <Player position={playerSpawnPoints[0][0]} rotation={playerSpawnPoints[0][1]} canJump={false} />
+          <RoomProvider>
+            <Player position={playerSpawnPoints[0][0]} rotation={playerSpawnPoints[0][1]} canJump={false} />
+            <MultiPlayers/>
+          </RoomProvider>
           <Map />
         </Physics>
 

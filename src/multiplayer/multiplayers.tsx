@@ -12,7 +12,8 @@ interface Player {
 }
 
 const MultiPlayers: React.FC = () => {
-    const { scene }: any = useGLTF(Model);
+    const { scene: originalScene }: any = useGLTF(Model);
+    const clonedScene = React.useMemo(() => originalScene.clone(), [originalScene]);
     const { room } = useRoom();
     const [players, setPlayers] = useState<Player[]>([]);
 
@@ -77,11 +78,11 @@ const MultiPlayers: React.FC = () => {
 
     return (
         <>
-            {scene && players.map((player, index) => (
+            {clonedScene && players.map((player, index) => (
                 <RigidBody key={index} includeInvisible lockRotations colliders={false} position={[...player.position]} mass={1} type="dynamic" rotation={[...player.rotation]}>
                     <CapsuleCollider args={[0.45, 0.75]} >
                         <group position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]} >
-                            <primitive object={scene} />
+                            <primitive object={clonedScene} />
                         </group>
                     </CapsuleCollider>
                 </RigidBody>

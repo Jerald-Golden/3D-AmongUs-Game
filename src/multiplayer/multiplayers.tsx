@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRoom } from "../multiplayer/roomContext";
 
-import Model from "../assets/glts/working_single_crew.glb";
-import { useGLTF } from "@react-three/drei";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+import ModelUrl from "../assets/glts/working_single_crew.glb";
 import { CapsuleCollider, RigidBody } from "@react-three/rapier";
 
 interface Player {
@@ -12,7 +13,6 @@ interface Player {
 }
 
 const MultiPlayers: React.FC = () => {
-    const { scene }: any = useGLTF(Model);
     const { room } = useRoom();
     const [players, setPlayers] = useState<Player[]>([]);
 
@@ -72,17 +72,15 @@ const MultiPlayers: React.FC = () => {
     }, [room]);
 
     useEffect(() => {
-        console.log("players: ", players);
+        // console.log("players: ", players);
     }, [players]);
 
     return (
         <>
-            {scene && players.map((player, index) => (
-                <RigidBody key={index} includeInvisible lockRotations colliders={false} position={[...player.position]} mass={1} type="dynamic" rotation={[...player.rotation]}>
+            {players.map((player, index) => (
+                <RigidBody key={player.id} includeInvisible lockRotations colliders={false} position={[...player.position]} mass={1} type="dynamic" rotation={[...player.rotation]}>
                     <CapsuleCollider args={[0.45, 0.75]} >
-                        <group position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]} >
-                            <primitive object={scene} />
-                        </group>
+                        <Model key={player.id} />
                     </CapsuleCollider>
                 </RigidBody>
             ))}
@@ -91,3 +89,41 @@ const MultiPlayers: React.FC = () => {
 };
 
 export default MultiPlayers;
+
+
+
+const Model: React.FC = () => {
+    const [model, setModel] = useState<any>(null);
+
+    const loader = useMemo(() => new GLTFLoader(), []);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        loader.load(
+            ModelUrl,
+            (gltf) => {
+                console.log('gltf: ', gltf);
+                if (isMounted) {
+                    setModel(gltf.scene);
+                }
+            },
+            undefined,
+            (error) => {
+                console.error("Error loading model:", error);
+            }
+        );
+
+        return () => {
+            isMounted = false;
+        };
+    }, [loader]);
+
+    if (!model) return null;
+
+    return (
+        <group position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]}>
+            <primitive object={model} />
+        </group>
+    );
+};

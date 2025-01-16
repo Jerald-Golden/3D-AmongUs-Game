@@ -49,13 +49,25 @@ const MultiPlayers: React.FC = () => {
             );
         };
 
+        // Handle kick notification
+        const onKick = (code: number) => {
+            console.log("Disconnected from the room:", code);
+            if (code === 1005) {
+                alert("You have been removed from the game.");
+                room.leave();
+            }
+        }
+
         room.state.players.onAdd(onAddPlayer);
         room.state.players.onRemove(onRemovePlayer);
         (room as any).onMessage("playerMoved", onPlayerMove);
+        (room as any).onLeave(onKick)
 
         return () => {
             room.state.players.off("add", onAddPlayer);
             room.state.players.off("remove", onRemovePlayer);
+            (room as any).offMessage("playerMoved", onPlayerMove);
+            (room as any).offMessage("kick", onKick);
         };
     }, [room]);
 

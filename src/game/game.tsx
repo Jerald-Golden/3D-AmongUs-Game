@@ -50,7 +50,7 @@ const Game = () => {
             )}
           </Physics>
 
-          <PointerLockControls maxPolarAngle={Math.PI / 2} minPolarAngle={0} />
+          <PointerLockControls maxPolarAngle={Math.PI / 2} minPolarAngle={(Math.PI / 2.1)} />
           <Minimap />
         </Canvas>
       </Suspense>

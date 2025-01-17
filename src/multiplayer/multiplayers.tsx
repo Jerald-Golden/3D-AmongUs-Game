@@ -103,7 +103,11 @@ const Model: React.FC = () => {
         loader.load(
             ModelUrl,
             (gltf) => {
-                console.log('gltf: ', gltf);
+                gltf.scene.traverse((child: any) => {
+                    if (child.isObject3D) {
+                        child.layers.set(1);
+                    }
+                });
                 if (isMounted) {
                     setModel(gltf.scene);
                 }
@@ -122,7 +126,7 @@ const Model: React.FC = () => {
     if (!model) return null;
 
     return (
-        <group position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]}>
+        <group layers={1} position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]}>
             <primitive object={model} />
         </group>
     );

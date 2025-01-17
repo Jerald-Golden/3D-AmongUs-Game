@@ -32,8 +32,12 @@ const Model: React.FC<{ visibility: boolean }> = (props) => {
         loader.load(
             ModelUrl,
             (gltf) => {
-                console.log('gltf: ', gltf);
                 if (isMounted) {
+                    gltf.scene.traverse((child: any) => {
+                        if (child.isObject3D) {
+                            child.layers.set(1);
+                        }
+                    });
                     setModel(gltf.scene);
                 }
             },

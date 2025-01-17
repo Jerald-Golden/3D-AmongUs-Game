@@ -38,7 +38,7 @@ const Player: React.FC<PlayerProps> = (props) => {
   useEffect(() => {
     camera.layers.enableAll();
     camera.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
-    const offset = isThirdPerson ? new THREE.Vector3(0, 1, 10) : new THREE.Vector3(0, 1, 0);
+    const offset = isThirdPerson ? new THREE.Vector3(0, 0, 10) : new THREE.Vector3(0, 0, 0);
     const cameraPosition = new THREE.Vector3(...props.position).add(offset.applyQuaternion(camera.quaternion));
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
     // eslint-disable-next-line
@@ -74,7 +74,7 @@ const Player: React.FC<PlayerProps> = (props) => {
     const currentQuaternion = new THREE.Quaternion(currentRotation.x, currentRotation.y, currentRotation.z, currentRotation.w);
 
     const offset = isThirdPerson ? new THREE.Vector3(0, 0, 10) : new THREE.Vector3(0, 0, 0);
-    const cameraPosition = new THREE.Vector3().copy(new THREE.Vector3(position.x, 1.8, position.z)).add(offset.applyQuaternion(camera.quaternion));
+    const cameraPosition = new THREE.Vector3().copy(new THREE.Vector3(position.x, position.y, position.z)).add(offset.applyQuaternion(camera.quaternion));
     camera.position.lerp(cameraPosition, 0.1);
 
     frontVector.set(0, 0, Number(backward) - Number(forward));

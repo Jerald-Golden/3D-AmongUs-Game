@@ -14,6 +14,8 @@ canvas {
   user-select: none;
 }
 
+/* loading screen */
+
 @keyframes foggyZoom {
   0% {
     background-color: rgba(255, 255, 255, 0);
@@ -97,6 +99,8 @@ canvas {
     0 0 20px rgba(255, 135, 170, 0.6);
 }
 
+/* chat Menu */
+
 .chat-container {
   position: fixed;
   bottom: 20px;
@@ -117,14 +121,21 @@ canvas {
 
 .message {
   margin-bottom: 10px;
-}
-
-.message.sent {
-  text-align: right;
-}
-
-.message.received {
   text-align: left;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+.message:last-child {
+  border-bottom: none;
+}
+
+.message strong {
+  color: #007bff;
 }
 
 .chat-input {
@@ -156,7 +167,8 @@ canvas {
   background-color: #0056b3;
 }
 
-/* StartingPage.css */
+/* Starting Page */
+
 .starting-page {
   position: fixed;
   top: 0;

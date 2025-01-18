@@ -12,6 +12,14 @@ const ChatUI = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState<string>('');
     const messageInputRef = useRef<HTMLInputElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to the bottom of the messages
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     // Listen for incoming messages from the server
     useEffect(() => {
@@ -28,6 +36,10 @@ const ChatUI = () => {
             (room as any).offMessage('chat', onChat);
         };
     }, [room]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     // Handle sending the message
     const sendMessage = () => {
@@ -47,11 +59,14 @@ const ChatUI = () => {
         <div className="chat-container" onClick={(e) => e.stopPropagation()}>
             <div className="messages">
                 {messages.map((msg, index) => (
-                    <div key={index} className={`message ${msg.sender === 'you' ? 'sent' : 'received'}`}>
-                        <strong>{msg.senderName || msg.sender}: </strong>
+                    <div key={index} className="message">
+                        <strong style={{ color: msg.sender === 'system' ? 'red' : msg.sender === 'Observer' ? 'yellow' : '#007bff', }}>
+                            {msg.sender}:
+                        </strong>{' '}
                         {msg.message}
                     </div>
                 ))}
+                <div ref={messagesEndRef} />
             </div>
             <div className="chat-input">
                 <input

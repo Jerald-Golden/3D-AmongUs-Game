@@ -37,4 +37,5 @@
 - **Chat Enhancements**:
   - Introduced auto-scroll for a better chat experience.
   - Improved message styling and added custom scrollbar styling.
-- **Name Validation**: Added name validation on the starting page to prevent the use of banned names (Names used for development).
+- **Name Validation**:
+  - Added name validation on the starting page to prevent the use of banned names (Names used for development).

@@ -60,7 +60,7 @@ const ChatUI = () => {
             <div className="messages">
                 {messages.map((msg, index) => (
                     <div key={index} className="message">
-                        <strong style={{ color: msg.sender === 'system' ? 'red' : msg.sender === 'Observer' ? 'yellow' : '#007bff', }}>
+                        <strong style={{ color: msg.sender === 'system' ? 'red' : msg.sender === 'observer' ? 'yellow' : '#007bff', }}>
                             {msg.sender}:
                         </strong>{' '}
                         {msg.message}

@@ -6,7 +6,6 @@ import Player from '../player/player';
 import { Suspense, useEffect, useState } from 'react';
 import Environments from '../environment/environment';
 import Map from './map/map';
-import { RoomProvider } from '../multiplayer/roomContext';
 import MultiPlayers from '../multiplayer/multiplayers';
 import Minimap from './map/minimap';
 
@@ -43,10 +42,10 @@ const Game = () => {
               <Map onLoad={handleMapLoad} />
             </Suspense>
             {mapLoaded && (
-              <RoomProvider>
+              <>
                 <Player position={playerSpawnPoints[0][0]} rotation={playerSpawnPoints[0][1]} canJump={false} />
                 <MultiPlayers />
-              </RoomProvider>
+              </>
             )}
           </Physics>
 

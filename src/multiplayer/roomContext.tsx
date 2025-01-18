@@ -12,26 +12,46 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const client = useRef<Client | null>(null);
 
     useEffect(() => {
-        client.current = new Client("https://game-server-v2rf.onrender.com/");
+        // Initialize the client and join the room
+        client.current = new Client("https://game-server-v2rf.onrender.com");
+        const playerName = localStorage.getItem("playerName");
 
-        client.current.joinOrCreate("state_handler", { role: "player" }).then((joinedRoom: any) => {
+        client.current.joinOrCreate("Room_handler", { name: playerName, role: "player" }).then((joinedRoom: any) => {
             setRoom(joinedRoom);
 
+            // Handle state updates for players
             joinedRoom.state.players.onAdd((player: any, key: any) => {
+                // Handle new player added
                 // console.log("Player added:", key, player);
             });
 
             joinedRoom.state.players.onRemove((player: any, key: any) => {
+                // Handle player removal
                 // console.log("Player removed:", key, player);
             });
 
+            // Handle player movement updates
             joinedRoom.onMessage("playerMoved", (data: any) => {
                 // console.log(data);
             });
+
+            // Handle chat messages
+            joinedRoom.onMessage("chat", (data: any) => {
+                // console.log("Received chat message:", data);
+            });
         });
+
+        return () => {
+            if (room) room.leave();
+        };
+        // eslint-disable-next-line
     }, []);
 
-    return <RoomContext.Provider value={{ room }}>{children}</RoomContext.Provider>;
+    return (
+        <RoomContext.Provider value={{ room }}>
+            {children}
+        </RoomContext.Provider>
+    );
 };
 
 export const useRoom = () => {

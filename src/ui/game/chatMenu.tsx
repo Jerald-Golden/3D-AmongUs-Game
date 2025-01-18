@@ -26,7 +26,6 @@ const ChatUI = () => {
         if (!room) return;
 
         const onChat = (data: Message) => {
-            console.log('Received chat message:', data);
             setMessages((prevMessages) => [...prevMessages, data]);
         };
 
@@ -51,7 +50,7 @@ const ChatUI = () => {
         room.send('message', { message });
 
         // Add it to the local message list with the sender as "you"
-        setMessages((prevMessages) => [...prevMessages, { sender: 'you', senderName: 'You', message }]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'You', senderName: 'You', message }]);
         setInputMessage('');
     };
 

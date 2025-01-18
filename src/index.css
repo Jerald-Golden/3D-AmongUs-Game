@@ -167,6 +167,24 @@ canvas {
   background-color: #0056b3;
 }
 
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background-color: #007bff;
+}
+
+.messages::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+}
+
 /* Starting Page */
 
 .starting-page {

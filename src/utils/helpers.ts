@@ -82,6 +82,7 @@ export const usePlayerControls = (): Movement => {
       document.removeEventListener('keyup', handleKeyUp);
       document.removeEventListener('pointerlockchange', handlePointerLockChange);
     };
+    // eslint-disable-next-line
   }, []);
 
   return movement;

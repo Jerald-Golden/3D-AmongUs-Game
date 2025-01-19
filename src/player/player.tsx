@@ -51,19 +51,20 @@ const Player: React.FC<PlayerProps> = (props) => {
   useEffect(() => {
     let staminaInterval: NodeJS.Timeout;
 
-    if (sprint) {
+    const isMoving = forward || backward || left || right;
+
+    if (sprint && isMoving) {
       staminaInterval = setInterval(() => {
         setStamina(Math.max(stamina - 10, 0));
       }, 1000);
-    } else if ((stamina < 100)) {
+    } else if (stamina < 100) {
       staminaInterval = setInterval(() => {
         setStamina(Math.min(stamina + 15, 100));
       }, 500);
     }
 
     return () => clearInterval(staminaInterval);
-    // eslint-disable-next-line
-  }, [sprint, stamina]);
+  }, [sprint, forward, backward, left, right, stamina, setStamina]);
 
   useFrame(() => {
     const rigidBody = rigidBodyRef.current;

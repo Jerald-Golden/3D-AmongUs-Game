@@ -20,7 +20,7 @@ export const usePlayerControls = (): Movement => {
     KeyP: 'cameraToggle',
     Space: 'jump',
     ShiftLeft: 'sprint',
-    Backquote: 'debug'
+    Backquote: 'debug',
   };
   const moveFieldByKey = (key: string): keyof Movement => keys[key];
 
@@ -37,31 +37,51 @@ export const usePlayerControls = (): Movement => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const field = moveFieldByKey(e.code);
-      setMovement((m) => ({
-        ...m,
-        [field]: field === 'cameraToggle' ? !m.cameraToggle : true,
-      }));
+      if (document.pointerLockElement !== null) {
+        const field = moveFieldByKey(e.code);
+        setMovement((m) => ({
+          ...m,
+          [field]: field === 'cameraToggle' ? !m.cameraToggle : true,
+        }));
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      const field = moveFieldByKey(e.code);
-      if (field !== 'cameraToggle') {
+      if (document.pointerLockElement !== null) {
+        const field = moveFieldByKey(e.code);
+        if (field !== 'cameraToggle') {
+          setMovement((m) => ({
+            ...m,
+            [field]: false,
+          }));
+        }
+      }
+    };
+
+    const handlePointerLockChange = () => {
+      if (document.pointerLockElement === null) {
         setMovement((m) => ({
-          ...m,
-          [field]: false,
+          forward: false,
+          backward: false,
+          left: false,
+          right: false,
+          cameraToggle: m.cameraToggle,
+          jump: false,
+          sprint: false,
+          debug: false,
         }));
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
+    document.addEventListener('pointerlockchange', handlePointerLockChange);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+      document.removeEventListener('pointerlockchange', handlePointerLockChange);
     };
-    // eslint-disable-next-line
   }, []);
 
   return movement;

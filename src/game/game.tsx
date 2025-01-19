@@ -34,7 +34,7 @@ const Game = () => {
   return (
     <>
       <Suspense fallback={null} >
-        <Canvas style={{ width: "100vw", height: "100vh" }} shadows camera={{ fov: 50 }}>
+        <Canvas gl={{ powerPreference: "high-performance" }} style={{ width: "100vw", height: "100vh" }} shadows camera={{ fov: 50 }}>
           <Environments />
 
           <Physics gravity={[0, -9.8, 0]} debug={debug} >

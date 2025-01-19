@@ -4,7 +4,7 @@ interface StartingPageProps {
     onEnterGame: (name: string) => void;
 }
 
-const bannedNames = ["observer", "admin", "root", "server"];
+const bannedNames = ["observer", "admin", "root", "server", "system"];
 
 const StartingPage: React.FC<StartingPageProps> = ({ onEnterGame }) => {
     const [name, setName] = useState("");
@@ -18,7 +18,7 @@ const StartingPage: React.FC<StartingPageProps> = ({ onEnterGame }) => {
         if (name.trim() === "") {
             setErrorMessage("Please enter a valid name.");
         } else if (bannedNames.includes(name.trim().toLowerCase())) {
-            setErrorMessage("You naughty naughty this name is not allowed.");
+            setErrorMessage("This name is not allowed.");
         } else {
             onEnterGame(name);
             localStorage.setItem("playerName", name);

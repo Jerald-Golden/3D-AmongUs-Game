@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
-import ModelUrl from "../assets/glts/working_single_crew.glb";
+import ModelUrl from "../assets/glts/final.glb";
+import { SkeletonUtils } from 'three-stdlib';
+import { useGraph } from '@react-three/fiber';
 
 const CharacterModel: React.FC<{ visibility: boolean }> = (props) => {
 
@@ -21,42 +21,41 @@ const CharacterModel: React.FC<{ visibility: boolean }> = (props) => {
 
 export default CharacterModel;
 
-const Model: React.FC<{ visibility: boolean }> = (props) => {
-    const [model, setModel] = useState<any>(null);
-
-    const loader = useMemo(() => new GLTFLoader(), []);
-
-    useEffect(() => {
-        let isMounted = true;
-
-        loader.load(
-            ModelUrl,
-            (gltf) => {
-                if (isMounted) {
-                    gltf.scene.traverse((child: any) => {
-                        if (child.isObject3D) {
-                            child.layers.set(1);
-                        }
-                    });
-                    setModel(gltf.scene);
-                }
-            },
-            undefined,
-            (error) => {
-                console.error("Error loading model:", error);
-            }
-        );
-
-        return () => {
-            isMounted = false;
-        };
-    }, [loader]);
-
-    if (!model) return null;
+export function Model(props: any) {
+    const { scene, materials }: any = useGLTF(ModelUrl);
+    const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+    const { nodes }: any = useGraph(clone);
 
     return (
-        <group visible={props.visibility} position={[0, -1.2, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0, -Math.PI, 0]}>
-            <primitive object={model} />
+        <group layers={1} visible={props.visibility} position={[0, -1.2, 0]} scale={[2.2, 2.2, 2.2]} rotation={[0, -Math.PI, 0]}>
+            <group layers={1} name="Scene">
+                <group layers={1} name="Armature" rotation={[Math.PI / 2, 0, 0]}>
+                    <group layers={1} name="Astronaut">
+                        <skinnedMesh
+                            layers={1}
+                            name="Astronautmesh"
+                            geometry={nodes.Astronautmesh.geometry}
+                            material={materials.SecondaryMaterial}
+                            skeleton={nodes.Astronautmesh.skeleton}
+                        />
+                        <skinnedMesh
+                            layers={1}
+                            name="Astronautmesh_1"
+                            geometry={nodes.Astronautmesh_1.geometry}
+                            material={materials.BaseMaterial}
+                            skeleton={nodes.Astronautmesh_1.skeleton}
+                        />
+                        <skinnedMesh
+                            layers={1}
+                            name="Astronautmesh_2"
+                            geometry={nodes.Astronautmesh_2.geometry}
+                            material={materials.BeltMaterial}
+                            skeleton={nodes.Astronautmesh_2.skeleton}
+                        />
+                    </group>
+                    <primitive object={nodes.mixamorigHips} />
+                </group>
+            </group>
         </group>
     );
 };

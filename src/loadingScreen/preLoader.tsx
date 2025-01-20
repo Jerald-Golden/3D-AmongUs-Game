@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 
 import amoungUsMapModel from "../assets/glts/among_us_map.glb";
-import amoungUsCharacterModel from "../assets/glts/working_single_crew.glb";
+import amoungUsCharacterModel from "../assets/glts/final.glb";
 
 const Preloader: React.FC = () => {
     const [progress, setProgress] = useState(0);

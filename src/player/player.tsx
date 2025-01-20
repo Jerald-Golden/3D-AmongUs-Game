@@ -101,12 +101,20 @@ const Player: React.FC<PlayerProps> = (props) => {
     const positionDiff = lastSentPosition.current.distanceTo(position);
     const rotationDiff = lastSentRotation.current.angleTo(currentQuaternion);
 
+    let state = "idle";
+    if (Math.abs(direction.x) > 0 || Math.abs(direction.z) > 0) {
+      state = sprint && stamina > 0 ? "run" : "walk";
+    }
+
     if (room && now - lastSentTime.current > 10 && (positionDiff > 0.01 || rotationDiff > 0.01)) {
       const euler: any = new THREE.Euler().setFromQuaternion(currentQuaternion, 'YXZ');
-      room.send('move', { position, rotation: { x: euler.x, y: euler.y, z: euler.z } });
+      room.send('move', { position, rotation: { x: euler.x, y: euler.y, z: euler.z }, state });
       lastSentPosition.current.copy(position);
       lastSentRotation.current.copy(currentQuaternion);
       lastSentTime.current = now;
+    } else if (room && now - lastSentTime.current > 500) {
+      const euler: any = new THREE.Euler().setFromQuaternion(currentQuaternion, 'YXZ');
+      room.send('move', { position, rotation: { x: euler.x, y: euler.y, z: euler.z }, state });
     }
   });
 

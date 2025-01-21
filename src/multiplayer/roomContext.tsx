@@ -13,7 +13,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         // Initialize the client and join the room
-        client.current = new Client("https://game-server-v2rf.onrender.com");
+        client.current = new Client("https://game-server-production-7250.up.railway.app");
         const playerName = localStorage.getItem("playerName");
 
         client.current.joinOrCreate("Room_handler", { name: playerName, role: "player" }).then((joinedRoom: any) => {

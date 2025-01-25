@@ -1,13 +1,12 @@
 import React from 'react';
 import Lights from './lights';
-import { Environment, Sky } from '@react-three/drei';
+import { Environment } from '@react-three/drei';
 
 const Environments: React.FC = () => {
     return (
         <>
             <Lights />
-            <Sky />
-            <fog attach="fog" args={['black', 0.005, 40]} />
+            <fog attach="fog" args={['black', 0.005, 30]} />
             <Environment preset='city' />
         </>
     );

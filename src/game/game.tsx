@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { PointerLockControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 
+import * as THREE from 'three';
 import Player from '../player/player';
 import { Suspense, useEffect, useState } from 'react';
 import Environments from '../environment/environment';
@@ -34,7 +35,7 @@ const Game = () => {
   return (
     <>
       <Suspense fallback={null} >
-        <Canvas gl={{ powerPreference: "high-performance" }} style={{ width: "100vw", height: "100vh" }} shadows camera={{ fov: 50 }}>
+        <Canvas gl={{ powerPreference: "high-performance" }} style={{ width: "100vw", height: "100vh" }} shadows camera={{ fov: 50 }} scene={{ background: new THREE.Color('black') }} >
           <Environments />
 
           <Physics gravity={[0, -9.8, 0]} debug={debug} >

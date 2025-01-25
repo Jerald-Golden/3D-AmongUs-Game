@@ -2,15 +2,23 @@ import { RigidBody, MeshCollider } from "@react-three/rapier";
 import { useGLTF } from "@react-three/drei";
 import { useRef, useEffect } from "react";
 
-import mapModel from "../../assets/glts/among_us_map.glb";
+import mapModel from "../../assets/glts/map.glb";
+import mapColliderModel from "../../assets/glts/colliders.glb";
 
 const Map: React.FC<{ onLoad: () => void }> = ({ onLoad }) => {
     const Gltf = useRef(null);
-    const { scene }: any = useGLTF(mapModel);
+    const { scene: mapScene }: any = useGLTF(mapModel);
+    const { scene: colliderScene }: any = useGLTF(mapColliderModel);
 
     useEffect(() => {
-        if (scene) {
-            scene.traverse((child: any) => {
+        if (mapScene && colliderScene) {
+            mapScene.traverse((child: any) => {
+                if (child.isObject3D) {
+                    child.layers.set(0);
+                }
+            });
+
+            colliderScene.traverse((child: any) => {
                 if (child.isObject3D) {
                     child.layers.set(0);
                 }
@@ -18,17 +26,22 @@ const Map: React.FC<{ onLoad: () => void }> = ({ onLoad }) => {
 
             onLoad();
         }
-    }, [scene, onLoad]);
+    }, [mapScene, colliderScene, onLoad]);
 
     return (
-        scene && (
-            <RigidBody scale={[20, 20, 20]} position={[0, 0, 0]} type="fixed" ref={Gltf}>
-                <mesh layers={0} castShadow receiveShadow>
-                    <MeshCollider type="trimesh">
-                        <primitive object={scene} />
-                    </MeshCollider>
+        mapScene && colliderScene && (
+            <>
+                <mesh scale={[20, 20, 20]} position={[0, 0, 0]} layers={0} castShadow receiveShadow>
+                    <primitive object={mapScene} />
                 </mesh>
-            </RigidBody>
+                <RigidBody includeInvisible scale={[20, 20, 20]} position={[0, 0, 0]} type="fixed" ref={Gltf}>
+                    <MeshCollider type="trimesh">
+                        <group visible={false} >
+                            <primitive object={colliderScene} />
+                        </group>
+                    </MeshCollider>
+                </RigidBody>
+            </>
         )
     );
 };

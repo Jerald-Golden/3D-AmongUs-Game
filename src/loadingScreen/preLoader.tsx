@@ -2,7 +2,8 @@ import LoadingBar from "./loadingBar";
 import { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 
-import amoungUsMapModel from "../assets/glts/among_us_map.glb";
+import amoungUsMapModel from "../assets/glts/map.glb";
+import amoungUsMapColliderModel from "../assets/glts/map.glb";
 import amoungUsCharacterModel from "../assets/glts/final.glb";
 
 const Preloader: React.FC = () => {
@@ -10,7 +11,7 @@ const Preloader: React.FC = () => {
     const [finished, setFinished] = useState(false);
 
     useEffect(() => {
-        const assets = [amoungUsMapModel, amoungUsCharacterModel];
+        const assets = [amoungUsMapModel, amoungUsCharacterModel, amoungUsMapColliderModel];
         let loaded = 0;
         const totalSteps = assets.length + 20;
 

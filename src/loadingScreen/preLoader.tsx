@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 
 import amoungUsMapModel from "../assets/glts/map.glb";
-import amoungUsMapColliderModel from "../assets/glts/map.glb";
+import amoungUsMapColliderModel from "../assets/glts/colliders.glb";
 import amoungUsCharacterModel from "../assets/glts/final.glb";
 
 const Preloader: React.FC = () => {
